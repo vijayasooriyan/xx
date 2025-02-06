@@ -1,0 +1,126 @@
+#include <iostream>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+bool isPrime(int num){
+    if(num <=1 ) return false;
+    for(int i=2;i*i<=num;i++) {
+        if(num % i==0) return false;
+    }
+    return true;
+}
+
+int main(){
+    int arr[10]={2,3,4,5,6,7,8,9,23};
+    int n=10;
+
+    pid_t pid;
+
+    pid = fork();
+    if(pid==0){
+        int sum=0;
+        for(int i=0;i<n;i++){
+            sum += arr[i];
+        }
+        cout<<"Sum of all numbers :"<<sum<<endl;
+        return 0;
+    } else if (pid >0){
+        wait(NULL);
+        pid =fork();
+    }
+
+    if(pid ==0){
+        int evenSum=0;
+        for(int i=0;i<n;i++){
+            if(arr[i]%2 ==0) evenSum+=arr[i];
+        }
+        cout<<"Sum of all even Number: "<<evenSum<<endl;
+        return 0;
+    } else if (pid>0){
+        wait(NULL);
+        pid=fork();
+    }
+
+    if(pid==0){
+        int oddSum=0;
+        for(int i=0;i<n;i++){
+            if(arr[i]%2 != 0) oddSum+=arr[i];
+        } 
+        cout<<"Sum of all odd Numbers : "<<oddSum<<endl;
+        return 0;
+    } else if(pid>0){
+        wait(NULL);
+        pid=fork();
+    }
+
+    if(pid==0){
+        int primeSum=0;
+        for(int i=0;i<n;i++){
+            if(isPrime(arr[i])) primeSum +=arr[i];
+        }
+        cout<<"Sum of all Prime Numbers : "<<primeSum<<endl;
+        return 0;
+    } else if(pid>0){
+        wait(NULL);
+        pid=fork();
+    }
+
+    if(pid ==0){
+        vector<int>sortedArr(arr,arr+n);
+        sort(sortedArr.begin(),sortedArr.end());
+        cout<<"Array in accending order ";
+        for(int num:sortedArr){
+            cout<<num<<" ";
+        } cout <<endl;
+        return 0;
+    } else if(pid>0){
+        wait(NULL);
+        pid=fork();
+    }
+
+    if(pid==0){
+        int maxNum=arr[0];
+        for(int i=1;i<n;i++){
+            if(arr[i] >maxNum) maxNum = arr[i];
+        } 
+        cout<<"Maximum Number : "<<maxNum<<endl;
+        return 0;
+    } else if(pid>0){
+        wait(NULL);
+        pid=fork();
+    }
+
+    if(pid==0){
+        int searchNum=15;
+        bool found =false;
+        for(int i=0;i<n;i++){
+            if(arr[i]==searchNum){
+                found=true;
+                break;
+            }
+        } 
+        if(found){
+            cout<<"Number "<<searchNum<<" Found in the array" <<endl;
+        } else {
+            cout<<"Nummber  "<<searchNum <<" Not found in the array"<<endl;
+        }
+        return 0;
+    } else if(pid>0){
+         wait(NULL);
+         cout<<"parent process : Array elemments Are: ";
+         for(int i=0;i<n;i++){
+            cout<<arr[i]<<" ";
+         }
+         cout<<endl;
+    } else {
+        cerr<<"fork failed";
+        return 1;
+    }
+    return 0;
+
+
+}
